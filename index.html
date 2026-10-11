@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fortnite: Battle Royale - Victory Crown & Crown Wins</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Main Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Top Right Corner Controls (Always Accessible) -->
+    <div class="top-actions-corner">
+      <button id="mute-btn" class="icon-btn" title="Toggle Sound">
+        <span id="mute-icon">🔊</span>
+      </button>
+    </div>
+
+    <!-- UI Overlay Layer -->
+    <div class="ui-overlay">
+
+      <!-- ================= LOBBY SCREEN ================= -->
+      <div id="lobby-screen" class="interactive">
+        <div class="lobby-header">
+          <div class="logo-container">
+            <h1 class="logo-text">FORTNITE</h1>
+            <span class="sub-tag">BATTLE ROYALE</span>
+          </div>
+
+          <!-- Lobby Navigation Tabs -->
+          <div class="lobby-nav-tabs">
+            <button class="lobby-nav-tab active" id="tab-btn-play">PLAY</button>
+            <button class="lobby-nav-tab" id="tab-btn-shop">🛒 ITEM SHOP</button>
+            <button class="lobby-nav-tab" id="tab-btn-locker">👕 LOCKER & CUSTOMIZE</button>
+          </div>
+
+          <div class="header-right-badges">
+            <!-- V-Bucks Header Badge -->
+            <div class="vbucks-badge-header">
+              <div class="vbucks-coin-icon">V</div>
+              <div class="vbucks-header-stats">
+                <span class="vbucks-header-label">V-BUCKS</span>
+                <span class="vbucks-header-value" id="lobby-vbucks-amount">1,000</span>
+              </div>
+            </div>
+
+            <!-- Crown Badge Header -->
+            <div class="crown-badge-header">
+              <!-- Crown SVG Icon -->
+              <svg class="crown-icon-img" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 50L12 18L26 34L32 12L38 34L52 18L58 50H6Z" fill="url(#crownGrad)" stroke="#FFE600" stroke-width="3" stroke-linejoin="round"/>
+                <ellipse cx="32" cy="50" rx="26" ry="6" fill="#B38600"/>
+                <circle cx="32" cy="14" r="4" fill="#FF0055" stroke="#FFF" stroke-width="1.5"/>
+                <circle cx="12" cy="20" r="3.5" fill="#00E5FF" stroke="#FFF" stroke-width="1.5"/>
+                <circle cx="52" cy="20" r="3.5" fill="#00E5FF" stroke="#FFF" stroke-width="1.5"/>
+                <defs>
+                  <linearGradient id="crownGrad" x1="32" y1="12" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFE600"/>
+                    <stop offset="1" stop-color="#FF9900"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="crown-header-stats">
+                <span class="crown-header-label">CROWN WINS</span>
+                <span class="crown-header-value" id="lobby-crown-wins">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= PLAY VIEW ================= -->
+        <div id="lobby-view-play" class="lobby-tab-view active">
+          <div class="lobby-content">
+            <!-- Hero Character Display -->
+            <div class="character-showcase">
+              <div class="pedestal">
+                <!-- Floating Crown when player holds crown / consecutive streak -->
+                <div id="hero-crown-container" class="hero-crown-container" style="display: none;">
+                  <svg class="crown-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 50L12 18L26 34L32 12L38 34L52 18L58 50H6Z" fill="url(#heroCrownGrad)" stroke="#FFF" stroke-width="2.5" stroke-linejoin="round"/>
+                    <circle cx="32" cy="14" r="4.5" fill="#FF0055" stroke="#FFF" stroke-width="1.5"/>
+                    <circle cx="12" cy="20" r="4" fill="#00E5FF" stroke="#FFF" stroke-width="1.5"/>
+                    <circle cx="52" cy="20" r="4" fill="#00E5FF" stroke="#FFF" stroke-width="1.5"/>
+                    <defs>
+                      <linearGradient id="heroCrownGrad" x1="32" y1="12" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF500"/>
+                        <stop offset="1" stop-color="#FF8800"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <span id="hero-crown-tag" class="crown-consec-tag">👑 CROWN EQUIPPED</span>
+                </div>
+
+                <!-- Hero Avatar Graphic -->
+                <div class="hero-avatar" id="hero-avatar">
+                  <!-- Dynamically rendered SVG -->
+                </div>
+
+                <div class="pedestal-base"></div>
+              </div>
+
+              <div class="character-card-name" id="lobby-character-name">AGENT JONESY</div>
+              <div class="character-level-badge" id="lobby-character-sub">CHAPTER 5 • 100 PLAYERS BATTLE ROYALE</div>
+            </div>
+
+            <!-- Right Sidebar: Stats & Crown Mechanics Guide -->
+            <div class="lobby-sidebar">
+              <div class="glass-panel stats-card">
+                <h3>🏆 CAREER HIGHLIGHTS</h3>
+                <div class="stat-row">
+                  <span class="stat-label">Consecutive Win Streak</span>
+                  <span class="stat-val gold" id="lobby-consec-wins">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Crown Royales (Crown Wins)</span>
+                  <span class="stat-val gold" id="lobby-crown-wins-stat">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Total Victory Royales</span>
+                  <span class="stat-val" id="lobby-total-wins">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Total Eliminations</span>
+                  <span class="stat-val" id="lobby-total-elims">0</span>
+                </div>
+              </div>
+
+              <div class="crown-feature-box">
+                <h4>👑 VICTORY CROWN SYSTEM</h4>
+                <p>
+                  <strong>1. Earn the Crown:</strong> Win a Battle Royale against 99 opponents to claim your Victory Crown.<br>
+                  <strong>2. Crown Wins Emote:</strong> If you win <strong>consecutively</strong>, you score a <strong>Crown Royale</strong>!<br>
+                  <strong>3. Collect V-Bucks:</strong> Grab coins around the map and open chests to buy skins in the <strong>Item Shop</strong>!
+                </p>
+                <button id="lobby-emote-btn" class="btn-fn purple" style="width: 100%; font-size: 1.15rem; padding: 10px 16px;">
+                  👑 PREVIEW CROWN EMOTE (B)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lobby-footer">
+            <div class="controls-hint">
+              <span><kbd>WASD</kbd> Move</span>
+              <span><kbd>Left Click</kbd> Shoot / Pickaxe</span>
+              <span><kbd>1 - 5</kbd> Weapons</span>
+              <span><kbd>Q</kbd> Build Wall</span>
+              <span><kbd>E</kbd> Open Chests & Loot</span>
+              <span><kbd>R</kbd> Reload</span>
+              <span><kbd>B</kbd> 👑 Crown Wins Emote</span>
+            </div>
+
+            <div class="play-action-area">
+              <button id="play-btn" class="btn-fn">
+                <span>READY UP!</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= ITEM SHOP VIEW ================= -->
+        <div id="lobby-view-shop" class="lobby-tab-view" style="display: none;">
+          <div class="shop-container">
+            <div class="shop-header-banner">
+              <div class="shop-title-area">
+                <h2 class="shop-title">ITEM SHOP</h2>
+                <span class="shop-subtitle">UNLOCK EXCLUSIVE HERO SKINS WITH YOUR COLLECTED V-BUCKS!</span>
+              </div>
+              <div class="shop-timer-badge">
+                <span class="shop-timer-icon">⏳</span>
+                <span>FEATURED ROTATION: <strong id="shop-timer">23:59:59</strong></span>
+              </div>
+            </div>
+
+            <div class="shop-grid" id="shop-skins-grid">
+              <!-- Rendered via JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= LOCKER / CUSTOMIZE VIEW ================= -->
+        <div id="lobby-view-locker" class="lobby-tab-view" style="display: none;">
+          <div class="locker-container">
+            <!-- Left Side: Live Character Preview -->
+            <div class="locker-preview-panel">
+              <div class="locker-pedestal-rig">
+                <div class="locker-pedestal-light"></div>
+                <div class="hero-avatar locker-avatar" id="locker-hero-avatar">
+                  <!-- Dynamically rendered SVG -->
+                </div>
+                <div class="pedestal-base"></div>
+              </div>
+              <div class="locker-character-meta">
+                <h3 class="locker-equipped-name" id="locker-equipped-name">AGENT JONESY</h3>
+                <div class="locker-equipped-badges">
+                  <span class="rarity-tag" id="locker-rarity-tag">COMMON</span>
+                  <span class="customized-indicator">CUSTOM FIT</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Customization Panels -->
+            <div class="locker-customizer-panel glass-panel">
+              <div class="customizer-tabs">
+                <button class="c-tab-btn active" data-tab="pickaxe" id="c-btn-pickaxe">⛏️ PICKAXE</button>
+                <button class="c-tab-btn" data-tab="skin-color" id="c-btn-skin-color">🎨 SKIN COLOR</button>
+                <button class="c-tab-btn" data-tab="hair" id="c-btn-hair">💇 HAIR & STYLE</button>
+              </div>
+
+              <!-- Subpanel: Pickaxe -->
+              <div class="c-panel active" id="c-panel-pickaxe">
+                <h4 class="c-section-title">CUSTOMIZE HARVESTING TOOL</h4>
+                <div class="pickaxe-options-grid" id="pickaxe-grid"></div>
+              </div>
+
+              <!-- Subpanel: Skin Tone -->
+              <div class="c-panel" id="c-panel-skin-color">
+                <h4 class="c-section-title">CUSTOMIZE SKIN COLOR</h4>
+                <div class="color-swatches-grid" id="skin-swatches-grid"></div>
+              </div>
+
+              <!-- Subpanel: Hair Style & Color -->
+              <div class="c-panel" id="c-panel-hair">
+                <h4 class="c-section-title">HAIR STYLE</h4>
+                <div class="hair-style-options" id="hair-style-grid"></div>
+                <h4 class="c-section-title" style="margin-top: 14px;">HAIR COLOR</h4>
+                <div class="color-swatches-grid" id="hair-color-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= IN-GAME HUD ================= -->
+      <div id="game-hud">
+        <!-- Top Bar -->
+        <div class="hud-top-bar">
+          <div class="alive-counter-card glass-panel">
+            <div class="alive-number-box">
+              <span class="alive-count" id="alive-count">100</span>
+              <span class="alive-label">ALIVE</span>
+            </div>
+            <div class="elims-box">
+              <span class="elims-count" id="elims-count">0</span>
+              <span class="elims-label">ELIMS</span>
+            </div>
+          </div>
+
+          <!-- Active V-Bucks In-Game Counter -->
+          <div class="hud-vbucks-panel glass-panel">
+            <span class="vbucks-coin-icon mini">V</span>
+            <span class="hud-vbucks-amount" id="hud-vbucks-amount">1,000</span>
+          </div>
+
+          <!-- Active Crown Indicator if player holds crown in match -->
+          <div id="hud-crown-active" class="hud-crown-active" style="display: none;">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M6 50L12 18L26 34L32 12L38 34L52 18L58 50H6Z" fill="#FFE600" stroke="#FFF" stroke-width="2"/>
+            </svg>
+            <span class="hud-crown-text" id="hud-crown-streak">👑 STREAK: 1</span>
+          </div>
+
+          <!-- Storm Timer -->
+          <div class="storm-status-panel">
+            <span class="storm-state-text" id="storm-state">STORM PHASE 1</span>
+            <span class="storm-timer-text" id="storm-timer">45s</span>
+          </div>
+
+          <!-- Minimap -->
+          <div class="minimap-container">
+            <canvas id="minimapCanvas" width="170" height="170"></canvas>
+          </div>
+        </div>
+
+        <!-- Killfeed -->
+        <div class="killfeed-container" id="killfeed-container"></div>
+
+        <!-- Crosshair in center -->
+        <div class="crosshair">
+          <div class="crosshair-center"></div>
+          <div class="crosshair-reticle"></div>
+        </div>
+
+        <!-- In-game Emote Banner / Toast (When B is pressed) -->
+        <div id="ingame-emote-toast">
+          <svg class="toast-crown-icon" viewBox="0 0 64 64" fill="none">
+            <path d="M6 50L12 18L26 34L32 12L38 34L52 18L58 50H6Z" fill="#FFE600" stroke="#FFF" stroke-width="3"/>
+            <circle cx="32" cy="14" r="4" fill="#FF0055"/>
+          </svg>
+          <span class="toast-text" id="toast-text">👑 FLEXED CROWN WINS: 2!</span>
+        </div>
+
+        <!-- Bottom Center: Health, Shield, Inventory Slots -->
+        <div class="hud-bottom-center">
+          <!-- Shield & Health Bars -->
+          <div class="status-bars-container">
+            <div class="status-bar-wrapper">
+              <div class="bar-fill shield" id="shield-bar-fill" style="width: 0%;"></div>
+              <div class="bar-content">
+                <span>SHIELD</span>
+                <span id="shield-value">0</span>
+              </div>
+            </div>
+            <div class="status-bar-wrapper">
+              <div class="bar-fill health" id="hp-bar-fill" style="width: 100%;"></div>
+              <div class="bar-content">
+                <span>HEALTH</span>
+                <span id="hp-value">100</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory (5 Slots) -->
+          <div class="inventory-bar">
+            <div class="inv-slot active" id="inv-slot-1">
+              <span class="inv-slot-num">1</span>
+              <div class="inv-slot-icon">⛏️</div>
+              <span class="inv-slot-ammo"></span>
+            </div>
+            <div class="inv-slot rarity-legendary" id="inv-slot-2">
+              <span class="inv-slot-num">2</span>
+              <div class="inv-slot-icon">🔫</div>
+              <span class="inv-slot-ammo">30/120</span>
+            </div>
+            <div class="inv-slot rarity-epic" id="inv-slot-3">
+              <span class="inv-slot-num">3</span>
+              <div class="inv-slot-icon">💥</div>
+              <span class="inv-slot-ammo">5/25</span>
+            </div>
+            <div class="inv-slot rarity-uncommon" id="inv-slot-4">
+              <span class="inv-slot-num">4</span>
+              <div class="inv-slot-icon">🧪</div>
+              <span class="inv-slot-ammo">x3</span>
+            </div>
+            <div class="inv-slot" id="inv-slot-5">
+              <span class="inv-slot-num">5</span>
+              <div class="inv-slot-icon"></div>
+              <span class="inv-slot-ammo"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Right: Materials & Emote Button -->
+        <div class="hud-bottom-right interactive">
+          <div class="materials-counter">
+            <span class="mat-icon">🪵</span>
+            <span class="mat-count" id="wood-count">150</span>
+            <span class="mat-build-hint">[Q] Wall</span>
+          </div>
+
+          <button id="hud-emote-btn" class="hud-emote-btn" title="Press B to Emote">
+            <span>👑</span>
+            <span>EMOTE [B]</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Battle Bus Jump Banner -->
+      <div id="battle-bus-banner">
+        <h2>BATTLE BUS DEPLOYED</h2>
+        <p>PRESS [SPACE] OR CLICK TO JUMP & GLIDE TO THE ISLAND!</p>
+      </div>
+
+      <!-- ================= VICTORY ROYALE SCREEN ================= -->
+      <div id="victory-screen" class="interactive">
+        <div class="victory-banner-top">
+          <div class="victory-title-small">#1 BATTLE ROYALE</div>
+          <h1 class="victory-title-big">VICTORY ROYALE</h1>
+          <div class="victory-rank-1">RANK #1 / 100 PLAYERS</div>
+        </div>
+
+        <!-- Crown Royale Achievement Showcase -->
+        <div class="crown-reward-card">
+          <div class="victory-crown-visual">
+            <svg class="crown-hero-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 50L12 18L26 34L32 12L38 34L52 18L58 50H6Z" fill="url(#vicCrownGrad)" stroke="#FFE600" stroke-width="3" stroke-linejoin="round"/>
+              <circle cx="32" cy="14" r="5" fill="#FF0055" stroke="#FFF" stroke-width="2"/>
+              <circle cx="12" cy="20" r="4.5" fill="#00E5FF" stroke="#FFF" stroke-width="2"/>
+              <circle cx="52" cy="20" r="4.5" fill="#00E5FF" stroke="#FFF" stroke-width="2"/>
+              <defs>
+                <linearGradient id="vicCrownGrad" x1="32" y1="12" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FFF700"/>
+                  <stop offset="1" stop-color="#FF8800"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span id="victory-crown-badge" class="crown-streak-count">👑 2 IN A ROW</span>
+          </div>
+
+          <h3 class="crown-status-msg" id="victory-crown-msg">👑 CROWN ROYALE ACHIEVED! 👑</h3>
+          <p class="crown-status-sub" id="victory-crown-sub">
+            Your consecutive win streak has been added to your Crown Wins Emote!
+          </p>
+
+          <div class="victory-stats-row">
+            <div class="v-stat-item">
+              <span class="v-stat-val" id="v-stat-elims">12</span>
+              <span class="v-stat-label">ELIMINATIONS</span>
+            </div>
+            <div class="v-stat-item">
+              <span class="v-stat-val" id="v-stat-crown-wins" style="color: var(--fn-gold);">2</span>
+              <span class="v-stat-label">CROWN WINS</span>
+            </div>
+            <div class="v-stat-item">
+              <span class="v-stat-val" id="v-stat-streak" style="color: var(--fn-cyan);">2</span>
+              <span class="v-stat-label">WIN STREAK</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="victory-actions">
+          <button id="victory-emote-btn" class="btn-fn purple">
+            <span>👑 SHOW OFF CROWN EMOTE</span>
+          </button>
+          <button id="victory-play-again" class="btn-fn">
+            <span>PLAY AGAIN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= ELIMINATED SCREEN ================= -->
+      <div id="eliminated-screen" class="interactive">
+        <div class="glass-panel eliminated-card">
+          <h2 class="eliminated-title">ELIMINATED</h2>
+          <span class="eliminated-rank" id="elim-rank-text">RANK: #42 / 100</span>
+
+          <div id="elim-crown-lost" class="crown-lost-alert" style="display: none;">
+            ⚠️ You dropped your Victory Crown upon elimination! Streak reset to 0.
+          </div>
+
+          <div class="victory-actions" style="margin-top: 25px;">
+            <button id="elim-play-again" class="btn-fn">
+              <span>PLAY AGAIN</span>
+            </button>
+            <button id="elim-lobby-btn" class="btn-fn blue">
+              <span>RETURN TO LOBBY</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= GRAND CROWN WINS EMOTE STAGE MODAL ================= -->
+      <div id="emote-stage-overlay">
+        <div class="emote-stage-card">
+          <div class="emote-crown-rig">
+            <!-- Radiant light rays -->
+            <div class="emote-light-rays"></div>
+
+            <!-- Purple royal velvet cushion -->
+            <div class="emote-pillow"></div>
+
+            <!-- Floating 3D Golden Crown with Glowing Hologram Number -->
+            <div class="emote-floating-crown">
+              <!-- HOLOGRAPHIC NUMBER SHOWING CONSECUTIVE CROWN WINS -->
+              <div class="emote-hologram-number" id="emote-holo-num">2</div>
+
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 50L12 18L26 34L32 12L38 34L52 18L58 50H6Z" fill="url(#emoteCrownGrad)" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
+                <ellipse cx="32" cy="50" rx="26" ry="6" fill="#B38600"/>
+                <circle cx="32" cy="14" r="5" fill="#FF0055" stroke="#FFF" stroke-width="2"/>
+                <circle cx="12" cy="20" r="4.5" fill="#00E5FF" stroke="#FFF" stroke-width="2"/>
+                <circle cx="52" cy="20" r="4.5" fill="#00E5FF" stroke="#FFF" stroke-width="2"/>
+                <defs>
+                  <linearGradient id="emoteCrownGrad" x1="32" y1="12" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFF952"/>
+                    <stop offset="0.6" stop-color="#FFB703"/>
+                    <stop offset="1" stop-color="#FB8500"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+
+          <h2 class="emote-title">CROWNING ACHIEVEMENT</h2>
+          <div class="emote-subtitle" id="emote-sub-detail">2 Consecutive Wins • 2 Crown Royales</div>
+          <p class="emote-desc">
+            The number displayed on the Victory Crown represents the number of matches won consecutively. Flex your Crown Royales to the entire lobby!
+          </p>
+
+          <button id="emote-close-btn" class="btn-fn emote-close-btn">
+            <span>CLOSE (CONTINUE)</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="map.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
